@@ -20,7 +20,7 @@ display:flex;
 /* SIDEBAR */
 
 .sidebar{
-width:230px;
+width:240px;
 background:black;
 height:100vh;
 position:fixed;
@@ -47,7 +47,7 @@ flex-direction:column;
 .nav a{
 color:white;
 text-decoration:none;
-padding:16px 20px;
+padding:15px 20px;
 border-bottom:1px solid #111;
 }
 
@@ -56,10 +56,10 @@ background:#161616;
 color:#ff2b2b;
 }
 
-/* MAIN CONTENT */
+/* MAIN */
 
 .main{
-margin-left:230px;
+margin-left:240px;
 padding:30px;
 width:100%;
 }
@@ -68,13 +68,23 @@ width:100%;
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-bottom:30px;
+margin-bottom:20px;
 }
 
 .header h1{
 color:#ff2b2b;
 margin:0;
 }
+
+.searchbar{
+background:#161616;
+border:none;
+padding:10px;
+color:white;
+width:250px;
+}
+
+/* STAT CARDS */
 
 .status-bar{
 display:flex;
@@ -101,14 +111,12 @@ margin:5px 0 0;
 font-size:20px;
 }
 
-/* TICKET QUEUE */
+/* TABLE */
 
 .ticket-table{
 width:100%;
 border-collapse:collapse;
 background:#161616;
-border-radius:4px;
-overflow:hidden;
 }
 
 .ticket-table th{
@@ -126,43 +134,145 @@ border-bottom:1px solid #222;
 background:#1d1d1d;
 }
 
-.priority-high{
-color:#ff4b4b;
-font-weight:bold;
+.priority-high{color:#ff4b4b;font-weight:bold;}
+.priority-medium{color:#ffaa00;}
+.priority-low{color:#5bd15b;}
+
+/* FORMS */
+
+.form-box{
+background:#161616;
+padding:25px;
+max-width:700px;
+border-left:4px solid #c40000;
 }
 
-.priority-medium{
-color:#ffaa00;
+.form-box input,
+.form-box select,
+.form-box textarea{
+width:100%;
+margin-bottom:15px;
+padding:10px;
+background:#0f0f0f;
+border:1px solid #333;
+color:white;
 }
 
-.priority-low{
+.form-box button{
+background:#c40000;
+border:none;
+padding:12px 20px;
+color:white;
+cursor:pointer;
+}
+
+.form-box button:hover{
+background:#ff2b2b;
+}
+
+/* CHAT */
+
+.chat-box{
+background:#161616;
+height:400px;
+overflow-y:auto;
+padding:15px;
+margin-bottom:10px;
+}
+
+.chat-input{
+display:flex;
+}
+
+.chat-input input{
+flex:1;
+padding:10px;
+background:#0f0f0f;
+border:1px solid #333;
+color:white;
+}
+
+.chat-input button{
+padding:10px 20px;
+background:#c40000;
+border:none;
+color:white;
+cursor:pointer;
+}
+
+/* AGENTS */
+
+.agent-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:20px;
+}
+
+.agent-card{
+background:#161616;
+padding:20px;
+border-left:4px solid #c40000;
+}
+
+.online{
 color:#5bd15b;
 }
 
-/* PLACEHOLDER PAGE */
-
-.placeholder{
-background:#161616;
-padding:40px;
-border-left:4px solid #c40000;
-border-radius:4px;
-margin-top:20px;
+.standby{
+color:#ffaa00;
 }
+
+/* KB */
+
+.kb-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:20px;
+}
+
+.kb-card{
+background:#161616;
+padding:20px;
+cursor:pointer;
+}
+
+.kb-card:hover{
+background:#1d1d1d;
+}
+
+/* NOTIFICATIONS */
+
+.notifications{
+background:#161616;
+padding:15px;
+margin-top:20px;
+border-left:4px solid #c40000;
+}
+
+.page{display:none;}
 
 </style>
 
 <script>
 
 function showPage(page){
-
 var pages=document.querySelectorAll(".page");
-
-pages.forEach(function(p){
-p.style.display="none";
-});
-
+pages.forEach(p=>p.style.display="none");
 document.getElementById(page).style.display="block";
+}
 
+function sendChat(){
+var input=document.getElementById("chatInput");
+var chat=document.getElementById("chatBox");
+
+chat.innerHTML += "<p><b>You:</b> "+input.value+"</p>";
+chat.innerHTML += "<p><b>AI:</b> Connecting to agent...</p>";
+
+input.value="";
+}
+
+function submitTicket(){
+alert("Ticket submitted (frontend demo)");
 }
 
 </script>
@@ -179,29 +289,28 @@ document.getElementById(page).style.display="block";
 
 <div class="nav">
 
-<a href="#" onclick="showPage('home')">Home</a>
-
-<a href="#" onclick="showPage('tickets')">Tickets</a>
-
-<a href="#" onclick="showPage('ai')">AI Agents</a>
-
-<a href="#" onclick="showPage('kb')">Knowledge Base</a>
-
-<a href="#" onclick="showPage('submit')">Submit Request</a>
-
-</div>
+<a onclick="showPage('home')">Dashboard</a>
+<a onclick="showPage('tickets')">Ticket Queue</a>
+<a onclick="showPage('status')">Ticket Status</a>
+<a onclick="showPage('submit')">Submit Ticket</a>
+<a onclick="showPage('ai')">AI Assistant</a>
+<a onclick="showPage('agents')">AI Agents</a>
+<a onclick="showPage('kb')">Knowledge Base</a>
+<a onclick="showPage('admin')">Admin</a>
 
 </div>
 
+</div>
 
 <div class="main">
 
-<!-- HOME PAGE -->
+<!-- DASHBOARD -->
 
-<div id="home" class="page">
+<div id="home" class="page" style="display:block">
 
 <div class="header">
 <h1>Help Desk Dashboard</h1>
+<input class="searchbar" placeholder="Search tickets or articles...">
 </div>
 
 <div class="status-bar">
@@ -228,8 +337,7 @@ document.getElementById(page).style.display="block";
 
 </div>
 
-
-<h2>Recent Ticket Queue</h2>
+<h2>Recent Tickets</h2>
 
 <table class="ticket-table">
 
@@ -265,141 +373,230 @@ document.getElementById(page).style.display="block";
 <td>Open</td>
 </tr>
 
+</table>
+
+<div class="notifications">
+
+<h3>Notifications</h3>
+
+<p>Ticket #1042 updated</p>
+<p>AI agent suggested response for ticket #1041</p>
+
+</div>
+
+</div>
+
+<!-- TICKET QUEUE -->
+
+<div id="tickets" class="page">
+
+<h1>Ticket Queue</h1>
+
+<table class="ticket-table">
+
 <tr>
-<td>#1039</td>
-<td>Internal</td>
-<td>MDM enrollment question</td>
+<th>ID</th>
+<th>Client</th>
+<th>Subject</th>
+<th>Status</th>
+<th>Priority</th>
+</tr>
+
+<tr>
+<td>#1042</td>
+<td>ACME Corp</td>
+<td>WiFi disconnecting</td>
+<td>Open</td>
+<td class="priority-high">High</td>
+</tr>
+
+<tr>
+<td>#1041</td>
+<td>Bright Dental</td>
+<td>Outlook not syncing</td>
+<td>In Progress</td>
 <td class="priority-medium">Medium</td>
-<td>Pending</td>
 </tr>
 
 </table>
 
 </div>
 
+<!-- STATUS PAGE -->
 
+<div id="status" class="page">
 
-<!-- TICKETS PAGE -->
+<h1>Check Ticket Status</h1>
 
-<div id="tickets" class="page" style="display:none">
+<div class="form-box">
 
-<h1>Tickets</h1>
+<input placeholder="Enter Ticket ID">
 
-<div class="placeholder">
-
-<h2>Ticket Management</h2>
-
-<p>
-This page will display the full help desk ticket system.
-Tickets will be pulled from the backend server hosted at the office.
-</p>
-
-<p>
-Features coming soon:
-</p>
-
-<ul>
-
-<li>Ticket assignment</li>
-<li>Tier 1 / Tier 2 queues</li>
-<li>Status tracking</li>
-<li>Internal technician notes</li>
-<li>Email-to-ticket automation</li>
-
-</ul>
+<button>Lookup Ticket</button>
 
 </div>
 
 </div>
 
+<!-- SUBMIT TICKET -->
 
-
-<!-- AI AGENTS PAGE -->
-
-<div id="ai" class="page" style="display:none">
-
-<h1>AI Agents</h1>
-
-<div class="placeholder">
-
-<h2>AI Help Desk Automation</h2>
-
-<p>
-Custom AI agents will analyze incoming tickets, emails, and knowledge base articles
-to automatically generate support responses.
-</p>
-
-<p>
-Technicians will be able to review and approve AI responses before they are sent to clients.
-</p>
-
-</div>
-
-</div>
-
-
-
-<!-- KNOWLEDGE BASE PAGE -->
-
-<div id="kb" class="page" style="display:none">
-
-<h1>Knowledge Base</h1>
-
-<div class="placeholder">
-
-<p>
-This section will store internal documentation and troubleshooting guides.
-</p>
-
-<p>
-Examples:
-</p>
-
-<ul>
-
-<li>macOS troubleshooting</li>
-<li>WiFi issues</li>
-<li>VPN setup</li>
-<li>Email configuration</li>
-<li>MDM enrollment steps</li>
-
-</ul>
-
-</div>
-
-</div>
-
-
-
-<!-- SUBMIT REQUEST -->
-
-<div id="submit" class="page" style="display:none">
+<div id="submit" class="page">
 
 <h1>Submit Support Request</h1>
 
-<div class="placeholder">
+<div class="form-box">
 
-<p>
-This page will allow clients to submit support requests directly to our help desk system.
-</p>
+<input placeholder="Full Name">
 
-<p>
-Future features:
-</p>
+<input placeholder="Email">
 
-<ul>
+<input placeholder="Company">
 
-<li>Client ticket form</li>
-<li>File attachments</li>
-<li>Automated ticket creation</li>
-<li>Email notifications</li>
+<select>
 
-</ul>
+<option>Category</option>
+<option>Billing</option>
+<option>Technical Support</option>
+<option>Account Access</option>
+<option>Refund Request</option>
+<option>Sales Question</option>
+
+</select>
+
+<select>
+
+<option>Priority</option>
+<option>Low</option>
+<option>Medium</option>
+<option>High</option>
+
+</select>
+
+<input placeholder="Subject">
+
+<textarea rows="6" placeholder="Describe your issue"></textarea>
+
+<input type="file">
+
+<button onclick="submitTicket()">Submit Ticket</button>
 
 </div>
 
 </div>
 
+<!-- AI CHAT -->
+
+<div id="ai" class="page">
+
+<h1>AI Support Assistant</h1>
+
+<div class="chat-box" id="chatBox">
+
+<p><b>AI:</b> Hello! How can I help you today?</p>
+
+</div>
+
+<div class="chat-input">
+
+<input id="chatInput" placeholder="Ask the AI assistant...">
+
+<button onclick="sendChat()">Send</button>
+
+</div>
+
+</div>
+
+<!-- AI AGENTS -->
+
+<div id="agents" class="page">
+
+<h1>AI Agent Status</h1>
+
+<div class="agent-grid">
+
+<div class="agent-card">
+<h3>Billing Agent</h3>
+<p class="online">● Online</p>
+</div>
+
+<div class="agent-card">
+<h3>Technical Agent</h3>
+<p class="online">● Online</p>
+</div>
+
+<div class="agent-card">
+<h3>Refund Agent</h3>
+<p class="online">● Online</p>
+</div>
+
+<div class="agent-card">
+<h3>Sales Agent</h3>
+<p class="online">● Online</p>
+</div>
+
+<div class="agent-card">
+<h3>Escalation Agent</h3>
+<p class="standby">● Standby</p>
+</div>
+
+</div>
+
+</div>
+
+<!-- KNOWLEDGE BASE -->
+
+<div id="kb" class="page">
+
+<h1>Knowledge Base</h1>
+
+<div class="kb-grid">
+
+<div class="kb-card">
+<h3>macOS Troubleshooting</h3>
+<p>Common Mac issues and fixes.</p>
+</div>
+
+<div class="kb-card">
+<h3>Email Setup</h3>
+<p>Configure Outlook and Apple Mail.</p>
+</div>
+
+<div class="kb-card">
+<h3>VPN Setup</h3>
+<p>Remote access instructions.</p>
+</div>
+
+<div class="kb-card">
+<h3>WiFi Issues</h3>
+<p>Fix unstable connections.</p>
+</div>
+
+<div class="kb-card">
+<h3>MDM Enrollment</h3>
+<p>Device management guide.</p>
+</div>
+
+</div>
+
+</div>
+
+<!-- ADMIN -->
+
+<div id="admin" class="page">
+
+<h1>Admin Panel</h1>
+
+<div class="notifications">
+
+<h3>System Logs</h3>
+
+<p>AI agents initialized</p>
+<p>Ticket system connected</p>
+<p>Knowledge base loaded</p>
+
+</div>
+
+</div>
 
 </div>
 
