@@ -39,15 +39,11 @@ border-bottom:1px solid #222;
 width:160px;
 }
 
-.nav{
-display:flex;
-flex-direction:column;
-}
-
 .nav a{
 color:white;
 text-decoration:none;
 padding:15px 20px;
+display:block;
 border-bottom:1px solid #111;
 }
 
@@ -73,18 +69,19 @@ margin-bottom:20px;
 
 .header h1{
 color:#ff2b2b;
-margin:0;
 }
+
+/* SEARCH */
 
 .searchbar{
 background:#161616;
 border:none;
 padding:10px;
 color:white;
-width:250px;
+width:260px;
 }
 
-/* STAT CARDS */
+/* CARDS */
 
 .status-bar{
 display:flex;
@@ -104,11 +101,6 @@ min-width:180px;
 .stat-card h3{
 margin:0;
 color:#ff2b2b;
-}
-
-.stat-card p{
-margin:5px 0 0;
-font-size:20px;
 }
 
 /* TABLE */
@@ -132,49 +124,45 @@ border-bottom:1px solid #222;
 
 .ticket-table tr:hover{
 background:#1d1d1d;
+cursor:pointer;
 }
 
 .priority-high{color:#ff4b4b;font-weight:bold;}
 .priority-medium{color:#ffaa00;}
 .priority-low{color:#5bd15b;}
 
-/* FORMS */
+/* MODAL */
 
-.form-box{
+.modal{
+display:none;
+position:fixed;
+z-index:999;
+left:0;
+top:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.85);
+}
+
+.modal-content{
 background:#161616;
-padding:25px;
-max-width:700px;
+margin:5% auto;
+padding:30px;
+width:70%;
 border-left:4px solid #c40000;
 }
 
-.form-box input,
-.form-box select,
-.form-box textarea{
-width:100%;
-margin-bottom:15px;
-padding:10px;
-background:#0f0f0f;
-border:1px solid #333;
-color:white;
-}
-
-.form-box button{
-background:#c40000;
-border:none;
-padding:12px 20px;
-color:white;
+.close{
+float:right;
 cursor:pointer;
-}
-
-.form-box button:hover{
-background:#ff2b2b;
+font-size:22px;
 }
 
 /* CHAT */
 
 .chat-box{
 background:#161616;
-height:400px;
+height:350px;
 overflow-y:auto;
 padding:15px;
 margin-bottom:10px;
@@ -197,29 +185,23 @@ padding:10px 20px;
 background:#c40000;
 border:none;
 color:white;
+}
+
+/* FLOATING AI */
+
+.ai-bubble{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#c40000;
+width:60px;
+height:60px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:28px;
 cursor:pointer;
-}
-
-/* AGENTS */
-
-.agent-grid{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-gap:20px;
-}
-
-.agent-card{
-background:#161616;
-padding:20px;
-border-left:4px solid #c40000;
-}
-
-.online{
-color:#5bd15b;
-}
-
-.standby{
-color:#ffaa00;
 }
 
 /* KB */
@@ -249,31 +231,93 @@ margin-top:20px;
 border-left:4px solid #c40000;
 }
 
+.notification{
+margin-bottom:8px;
+}
+
+textarea{
+width:100%;
+background:#0f0f0f;
+border:1px solid #333;
+color:white;
+padding:10px;
+}
+
+button{
+background:#c40000;
+border:none;
+padding:10px 18px;
+color:white;
+cursor:pointer;
+}
+
 .page{display:none;}
 
 </style>
 
 <script>
 
+/* PAGE NAV */
+
 function showPage(page){
-var pages=document.querySelectorAll(".page");
-pages.forEach(p=>p.style.display="none");
+document.querySelectorAll(".page").forEach(p=>p.style.display="none");
 document.getElementById(page).style.display="block";
 }
 
-function sendChat(){
-var input=document.getElementById("chatInput");
-var chat=document.getElementById("chatBox");
+/* TICKET POPUP */
 
-chat.innerHTML += "<p><b>You:</b> "+input.value+"</p>";
-chat.innerHTML += "<p><b>AI:</b> Connecting to agent...</p>";
+function openTicket(id){
+document.getElementById("ticketModal").style.display="block";
+document.getElementById("ticketID").innerText=id;
+}
+
+function closeModal(){
+document.getElementById("ticketModal").style.display="none";
+}
+
+/* CHAT */
+
+function sendChat(){
+let input=document.getElementById("chatInput");
+let box=document.getElementById("chatBox");
+
+box.innerHTML += "<p><b>You:</b> "+input.value+"</p>";
+box.innerHTML += "<p><b>AI:</b> Thinking...</p>";
 
 input.value="";
 }
 
-function submitTicket(){
-alert("Ticket submitted (frontend demo)");
+/* KB VIEW */
+
+function openKB(title,content){
+document.getElementById("kbTitle").innerText=title;
+document.getElementById("kbContent").innerText=content;
+document.getElementById("kbModal").style.display="block";
 }
+
+/* LIVE NOTIFICATIONS */
+
+setInterval(function(){
+
+let box=document.getElementById("notificationFeed");
+
+if(!box) return;
+
+let messages=[
+"AI suggested reply for ticket #1042",
+"Ticket #1041 updated",
+"New support request received"
+];
+
+let msg=messages[Math.floor(Math.random()*messages.length)];
+
+let el=document.createElement("div");
+el.className="notification";
+el.innerText=msg;
+
+box.prepend(el);
+
+},12000);
 
 </script>
 
@@ -290,13 +334,9 @@ alert("Ticket submitted (frontend demo)");
 <div class="nav">
 
 <a onclick="showPage('home')">Dashboard</a>
-<a onclick="showPage('tickets')">Ticket Queue</a>
-<a onclick="showPage('status')">Ticket Status</a>
-<a onclick="showPage('submit')">Submit Ticket</a>
-<a onclick="showPage('ai')">AI Assistant</a>
-<a onclick="showPage('agents')">AI Agents</a>
+<a onclick="showPage('tickets')">Tickets</a>
 <a onclick="showPage('kb')">Knowledge Base</a>
-<a onclick="showPage('admin')">Admin</a>
+<a onclick="showPage('ai')">AI Assistant</a>
 
 </div>
 
@@ -309,35 +349,41 @@ alert("Ticket submitted (frontend demo)");
 <div id="home" class="page" style="display:block">
 
 <div class="header">
+
 <h1>Help Desk Dashboard</h1>
-<input class="searchbar" placeholder="Search tickets or articles...">
+
+<input class="searchbar" placeholder="Search tickets or KB">
+
 </div>
 
 <div class="status-bar">
 
-<div class="stat-card">
-<h3>Open Tickets</h3>
-<p>12</p>
+<div class="stat-card"><h3>Open Tickets</h3><p>12</p></div>
+<div class="stat-card"><h3>Tier 1</h3><p>7</p></div>
+<div class="stat-card"><h3>Tier 2</h3><p>5</p></div>
+<div class="stat-card"><h3>AI Suggested</h3><p>3</p></div>
+
 </div>
 
-<div class="stat-card">
-<h3>Tier 1 Queue</h3>
-<p>7</p>
-</div>
+<div class="notifications">
 
-<div class="stat-card">
-<h3>Tier 2 Queue</h3>
-<p>5</p>
-</div>
+<h3>Live Notifications</h3>
 
-<div class="stat-card">
-<h3>AI Suggested</h3>
-<p>3</p>
+<div id="notificationFeed">
+
+<div class="notification">System online</div>
+
 </div>
 
 </div>
 
-<h2>Recent Tickets</h2>
+</div>
+
+<!-- TICKETS -->
+
+<div id="tickets" class="page">
+
+<h1>Ticket Queue</h1>
 
 <table class="ticket-table">
 
@@ -349,136 +395,48 @@ alert("Ticket submitted (frontend demo)");
 <th>Status</th>
 </tr>
 
-<tr>
-<td>#1042</td>
-<td>ACME Corp</td>
-<td>MacBook WiFi disconnecting</td>
-<td class="priority-high">High</td>
-<td>Open</td>
-</tr>
-
-<tr>
-<td>#1041</td>
-<td>Bright Dental</td>
-<td>Outlook not syncing</td>
-<td class="priority-medium">Medium</td>
-<td>In Progress</td>
-</tr>
-
-<tr>
-<td>#1040</td>
-<td>Northwind LLC</td>
-<td>Printer setup issue</td>
-<td class="priority-low">Low</td>
-<td>Open</td>
-</tr>
-
-</table>
-
-<div class="notifications">
-
-<h3>Notifications</h3>
-
-<p>Ticket #1042 updated</p>
-<p>AI agent suggested response for ticket #1041</p>
-
-</div>
-
-</div>
-
-<!-- TICKET QUEUE -->
-
-<div id="tickets" class="page">
-
-<h1>Ticket Queue</h1>
-
-<table class="ticket-table">
-
-<tr>
-<th>ID</th>
-<th>Client</th>
-<th>Subject</th>
-<th>Status</th>
-<th>Priority</th>
-</tr>
-
-<tr>
+<tr onclick="openTicket('#1042')">
 <td>#1042</td>
 <td>ACME Corp</td>
 <td>WiFi disconnecting</td>
-<td>Open</td>
 <td class="priority-high">High</td>
+<td>Open</td>
 </tr>
 
-<tr>
+<tr onclick="openTicket('#1041')">
 <td>#1041</td>
 <td>Bright Dental</td>
 <td>Outlook not syncing</td>
-<td>In Progress</td>
 <td class="priority-medium">Medium</td>
+<td>In Progress</td>
 </tr>
 
 </table>
 
 </div>
 
-<!-- STATUS PAGE -->
+<!-- KB -->
 
-<div id="status" class="page">
+<div id="kb" class="page">
 
-<h1>Check Ticket Status</h1>
+<h1>Knowledge Base</h1>
 
-<div class="form-box">
+<div class="kb-grid">
 
-<input placeholder="Enter Ticket ID">
-
-<button>Lookup Ticket</button>
-
+<div class="kb-card" onclick="openKB('WiFi Troubleshooting','Reset network settings and remove old profiles.')">
+<h3>WiFi Issues</h3>
+<p>Fix unstable connections</p>
 </div>
 
+<div class="kb-card" onclick="openKB('Outlook Sync','Rebuild Outlook profile to restore syncing.')">
+<h3>Email Sync</h3>
+<p>Outlook troubleshooting</p>
 </div>
 
-<!-- SUBMIT TICKET -->
-
-<div id="submit" class="page">
-
-<h1>Submit Support Request</h1>
-
-<div class="form-box">
-
-<input placeholder="Full Name">
-
-<input placeholder="Email">
-
-<input placeholder="Company">
-
-<select>
-
-<option>Category</option>
-<option>Billing</option>
-<option>Technical Support</option>
-<option>Account Access</option>
-<option>Refund Request</option>
-<option>Sales Question</option>
-
-</select>
-
-<select>
-
-<option>Priority</option>
-<option>Low</option>
-<option>Medium</option>
-<option>High</option>
-
-</select>
-
-<input placeholder="Subject">
-
-<textarea rows="6" placeholder="Describe your issue"></textarea>
-
-<input type="file">
-
-<button onclick="submitTicket()">Submit Ticket</button>
+<div class="kb-card" onclick="openKB('VPN Setup','Install VPN client and import config file.')">
+<h3>VPN Setup</h3>
+<p>Remote access guide</p>
+</div>
 
 </div>
 
@@ -492,13 +450,13 @@ alert("Ticket submitted (frontend demo)");
 
 <div class="chat-box" id="chatBox">
 
-<p><b>AI:</b> Hello! How can I help you today?</p>
+<p><b>AI:</b> Hello! How can I assist you today?</p>
 
 </div>
 
 <div class="chat-input">
 
-<input id="chatInput" placeholder="Ask the AI assistant...">
+<input id="chatInput" placeholder="Ask the AI...">
 
 <button onclick="sendChat()">Send</button>
 
@@ -506,97 +464,60 @@ alert("Ticket submitted (frontend demo)");
 
 </div>
 
-<!-- AI AGENTS -->
-
-<div id="agents" class="page">
-
-<h1>AI Agent Status</h1>
-
-<div class="agent-grid">
-
-<div class="agent-card">
-<h3>Billing Agent</h3>
-<p class="online">● Online</p>
 </div>
 
-<div class="agent-card">
-<h3>Technical Agent</h3>
-<p class="online">● Online</p>
-</div>
 
-<div class="agent-card">
-<h3>Refund Agent</h3>
-<p class="online">● Online</p>
-</div>
+<!-- TICKET MODAL -->
 
-<div class="agent-card">
-<h3>Sales Agent</h3>
-<p class="online">● Online</p>
-</div>
+<div class="modal" id="ticketModal">
 
-<div class="agent-card">
-<h3>Escalation Agent</h3>
-<p class="standby">● Standby</p>
-</div>
+<div class="modal-content">
+
+<span class="close" onclick="closeModal()">X</span>
+
+<h2>Ticket Details <span id="ticketID"></span></h2>
+
+<p><b>Client:</b> ACME Corp</p>
+
+<p><b>Issue:</b> MacBook WiFi disconnecting</p>
+
+<p><b>Status:</b> Open</p>
+
+<h3>Technician Reply</h3>
+
+<textarea rows="6" placeholder="Write response to client..."></textarea>
+
+<br><br>
+
+<button>Send Reply</button>
 
 </div>
 
 </div>
 
-<!-- KNOWLEDGE BASE -->
 
-<div id="kb" class="page">
+<!-- KB ARTICLE MODAL -->
 
-<h1>Knowledge Base</h1>
+<div class="modal" id="kbModal">
 
-<div class="kb-grid">
+<div class="modal-content">
 
-<div class="kb-card">
-<h3>macOS Troubleshooting</h3>
-<p>Common Mac issues and fixes.</p>
-</div>
+<span class="close" onclick="this.parentElement.parentElement.style.display='none'">X</span>
 
-<div class="kb-card">
-<h3>Email Setup</h3>
-<p>Configure Outlook and Apple Mail.</p>
-</div>
+<h2 id="kbTitle"></h2>
 
-<div class="kb-card">
-<h3>VPN Setup</h3>
-<p>Remote access instructions.</p>
-</div>
-
-<div class="kb-card">
-<h3>WiFi Issues</h3>
-<p>Fix unstable connections.</p>
-</div>
-
-<div class="kb-card">
-<h3>MDM Enrollment</h3>
-<p>Device management guide.</p>
-</div>
+<p id="kbContent"></p>
 
 </div>
 
 </div>
 
-<!-- ADMIN -->
 
-<div id="admin" class="page">
+<!-- FLOATING AI -->
 
-<h1>Admin Panel</h1>
+<div class="ai-bubble" onclick="showPage('ai')">
 
-<div class="notifications">
-
-<h3>System Logs</h3>
-
-<p>AI agents initialized</p>
-<p>Ticket system connected</p>
-<p>Knowledge base loaded</p>
-
-</div>
-
-</div>
+💬
 
 </div>
 
