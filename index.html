@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -81,7 +82,7 @@ color:white;
 width:260px;
 }
 
-/* CARDS */
+/* STATUS CARDS */
 
 .status-bar{
 display:flex;
@@ -131,7 +132,7 @@ cursor:pointer;
 .priority-medium{color:#ffaa00;}
 .priority-low{color:#5bd15b;}
 
-/* MODAL */
+/* MODALS */
 
 .modal{
 display:none;
@@ -156,6 +157,24 @@ border-left:4px solid #c40000;
 float:right;
 cursor:pointer;
 font-size:22px;
+}
+
+/* KB GRID */
+
+.kb-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:20px;
+}
+
+.kb-card{
+background:#161616;
+padding:20px;
+cursor:pointer;
+}
+
+.kb-card:hover{
+background:#1d1d1d;
 }
 
 /* CHAT */
@@ -187,6 +206,36 @@ border:none;
 color:white;
 }
 
+/* AGENTS */
+
+.agent-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:20px;
+}
+
+.agent-card{
+background:#161616;
+padding:20px;
+border-left:4px solid #c40000;
+}
+
+.online{color:#5bd15b;}
+.standby{color:#ffaa00;}
+
+/* NOTIFICATIONS */
+
+.notifications{
+background:#161616;
+padding:15px;
+margin-top:20px;
+border-left:4px solid #c40000;
+}
+
+.notification{
+margin-bottom:8px;
+}
+
 /* FLOATING AI */
 
 .ai-bubble{
@@ -202,37 +251,6 @@ align-items:center;
 justify-content:center;
 font-size:28px;
 cursor:pointer;
-}
-
-/* KB */
-
-.kb-grid{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-gap:20px;
-}
-
-.kb-card{
-background:#161616;
-padding:20px;
-cursor:pointer;
-}
-
-.kb-card:hover{
-background:#1d1d1d;
-}
-
-/* NOTIFICATIONS */
-
-.notifications{
-background:#161616;
-padding:15px;
-margin-top:20px;
-border-left:4px solid #c40000;
-}
-
-.notification{
-margin-bottom:8px;
 }
 
 textarea{
@@ -337,6 +355,7 @@ box.prepend(el);
 <a onclick="showPage('tickets')">Tickets</a>
 <a onclick="showPage('kb')">Knowledge Base</a>
 <a onclick="showPage('ai')">AI Assistant</a>
+<a onclick="showPage('agents')">AI Agents</a>
 
 </div>
 
@@ -349,20 +368,15 @@ box.prepend(el);
 <div id="home" class="page" style="display:block">
 
 <div class="header">
-
 <h1>Help Desk Dashboard</h1>
-
 <input class="searchbar" placeholder="Search tickets or KB">
-
 </div>
 
 <div class="status-bar">
-
 <div class="stat-card"><h3>Open Tickets</h3><p>12</p></div>
 <div class="stat-card"><h3>Tier 1</h3><p>7</p></div>
 <div class="stat-card"><h3>Tier 2</h3><p>5</p></div>
 <div class="stat-card"><h3>AI Suggested</h3><p>3</p></div>
-
 </div>
 
 <div class="notifications">
@@ -370,9 +384,7 @@ box.prepend(el);
 <h3>Live Notifications</h3>
 
 <div id="notificationFeed">
-
 <div class="notification">System online</div>
-
 </div>
 
 </div>
@@ -415,7 +427,7 @@ box.prepend(el);
 
 </div>
 
-<!-- KB -->
+<!-- KNOWLEDGE BASE -->
 
 <div id="kb" class="page">
 
@@ -449,23 +461,54 @@ box.prepend(el);
 <h1>AI Support Assistant</h1>
 
 <div class="chat-box" id="chatBox">
-
 <p><b>AI:</b> Hello! How can I assist you today?</p>
-
 </div>
 
 <div class="chat-input">
-
 <input id="chatInput" placeholder="Ask the AI...">
-
 <button onclick="sendChat()">Send</button>
+</div>
 
+</div>
+
+<!-- AI AGENTS -->
+
+<div id="agents" class="page">
+
+<h1>AI Agent Status</h1>
+
+<div class="agent-grid">
+
+<div class="agent-card">
+<h3>Ticket Analyzer</h3>
+<p class="online">● Online</p>
+</div>
+
+<div class="agent-card">
+<h3>KB Search Agent</h3>
+<p class="online">● Online</p>
+</div>
+
+<div class="agent-card">
+<h3>Solution Generator</h3>
+<p class="online">● Online</p>
+</div>
+
+<div class="agent-card">
+<h3>MacOS Specialist</h3>
+<p class="online">● Online</p>
+</div>
+
+<div class="agent-card">
+<h3>Escalation Agent</h3>
+<p class="standby">● Standby</p>
 </div>
 
 </div>
 
 </div>
 
+</div>
 
 <!-- TICKET MODAL -->
 
@@ -478,9 +521,7 @@ box.prepend(el);
 <h2>Ticket Details <span id="ticketID"></span></h2>
 
 <p><b>Client:</b> ACME Corp</p>
-
 <p><b>Issue:</b> MacBook WiFi disconnecting</p>
-
 <p><b>Status:</b> Open</p>
 
 <h3>Technician Reply</h3>
@@ -495,8 +536,7 @@ box.prepend(el);
 
 </div>
 
-
-<!-- KB ARTICLE MODAL -->
+<!-- KB MODAL -->
 
 <div class="modal" id="kbModal">
 
@@ -505,21 +545,18 @@ box.prepend(el);
 <span class="close" onclick="this.parentElement.parentElement.style.display='none'">X</span>
 
 <h2 id="kbTitle"></h2>
-
 <p id="kbContent"></p>
 
 </div>
 
 </div>
 
-
 <!-- FLOATING AI -->
 
 <div class="ai-bubble" onclick="showPage('ai')">
-
 💬
-
 </div>
 
 </body>
 </html>
+```
