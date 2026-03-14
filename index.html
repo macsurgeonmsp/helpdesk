@@ -274,69 +274,160 @@ cursor:pointer;
 </style>
 
 <script>
-
-/* PAGE NAV */
-
+/* ------------------------------
+   PAGE NAVIGATION
+--------------------------------*/
 function showPage(page){
-document.querySelectorAll(".page").forEach(p=>p.style.display="none");
-document.getElementById(page).style.display="block";
+    document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+    document.getElementById(page).style.display="block";
 }
 
-/* TICKET POPUP */
+/* ------------------------------
+   TICKET & KB API CONFIG
+--------------------------------*/
+const API_BASE = "http://192.168.0.66:5000"; // Beelink server IP
 
-function openTicket(id){
-document.getElementById("ticketModal").style.display="block";
-document.getElementById("ticketID").innerText=id;
+/* ------------------------------
+   DYNAMIC TICKET TABLE
+--------------------------------*/
+async function loadTickets() {
+    const tableBody = document.querySelector(".ticket-table tbody");
+    if (!tableBody) return;
+
+    tableBody.innerHTML = ""; // clear existing rows
+
+    try {
+        const res = await fetch(`${API_BASE}/tickets`);
+        const tickets = await res.json();
+
+        tickets.forEach(ticket => {
+            const tr = document.createElement("tr");
+            tr.onclick = () => openTicket(ticket.id);
+            tr.innerHTML = `
+                <td>#${ticket.id}</td>
+                <td>${ticket.client}</td>
+                <td>${ticket.issue}</td>
+                <td class="priority-${ticket.priority.toLowerCase()}">${ticket.priority}</td>
+                <td>${ticket.status}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    } catch (err) {
+        console.error("Failed to load tickets:", err);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="5">Error loading tickets</td>`;
+        tableBody.appendChild(tr);
+    }
+}
+
+/* ------------------------------
+   DYNAMIC KB GRID
+--------------------------------*/
+async function loadKB() {
+    const kbGrid = document.querySelector(".kb-grid");
+    if (!kbGrid) return;
+
+    kbGrid.innerHTML = ""; // clear existing cards
+
+    try {
+        const res = await fetch(`${API_BASE}/kb`);
+        const kbArticles = await res.json();
+
+        kbArticles.forEach(article => {
+            const div = document.createElement("div");
+            div.className = "kb-card";
+            div.onclick = () => openKB(article.title, article.summary || article.content);
+            div.innerHTML = `
+                <h3>${article.title}</h3>
+                <p>${article.summary || article.content.slice(0, 100) + "..."}</p>
+            `;
+            kbGrid.appendChild(div);
+        });
+    } catch (err) {
+        console.error("Failed to load KB articles:", err);
+        kbGrid.innerHTML = "<p>Error loading knowledge base</p>";
+    }
+}
+
+/* ------------------------------
+   TICKET MODAL
+--------------------------------*/
+async function openTicket(ticketId) {
+    const modal = document.getElementById("ticketModal");
+    modal.style.display = "block";
+
+    try {
+        const res = await fetch(`${API_BASE}/tickets`);
+        const tickets = await res.json();
+        const ticket = tickets.find(t => t.id === ticketId);
+        if (!ticket) throw new Error("Ticket not found");
+
+        document.getElementById("ticketID").innerText = `#${ticket.id}`;
+        modal.querySelector("textarea").value = ticket.response || "";
+        modal.querySelector("p:nth-child(3)").innerHTML = `<b>Client:</b> ${ticket.client}`;
+        modal.querySelector("p:nth-child(4)").innerHTML = `<b>Issue:</b> ${ticket.issue}`;
+        modal.querySelector("p:nth-child(5)").innerHTML = `<b>Status:</b> ${ticket.status}`;
+    } catch (err) {
+        console.error(err);
+        modal.querySelector("textarea").value = "Error loading ticket details";
+    }
 }
 
 function closeModal(){
-document.getElementById("ticketModal").style.display="none";
+    document.getElementById("ticketModal").style.display="none";
 }
 
-/* CHAT */
+/* ------------------------------
+   KB MODAL
+--------------------------------*/
+function openKB(title, content){
+    document.getElementById("kbTitle").innerText = title;
+    document.getElementById("kbContent").innerText = content;
+    document.getElementById("kbModal").style.display = "block";
+}
 
+/* ------------------------------
+   AI CHAT (demo)
+--------------------------------*/
 function sendChat(){
-let input=document.getElementById("chatInput");
-let box=document.getElementById("chatBox");
+    let input = document.getElementById("chatInput");
+    let box = document.getElementById("chatBox");
 
-box.innerHTML += "<p><b>You:</b> "+input.value+"</p>";
-box.innerHTML += "<p><b>AI:</b> Thinking...</p>";
+    if(input.value.trim() === "") return;
 
-input.value="";
+    box.innerHTML += `<p><b>You:</b> ${input.value}</p>`;
+    box.innerHTML += `<p><b>AI:</b> Thinking...</p>`;
+
+    input.value = "";
 }
 
-/* KB VIEW */
-
-function openKB(title,content){
-document.getElementById("kbTitle").innerText=title;
-document.getElementById("kbContent").innerText=content;
-document.getElementById("kbModal").style.display="block";
-}
-
-/* LIVE NOTIFICATIONS */
-
+/* ------------------------------
+   LIVE NOTIFICATIONS (demo)
+--------------------------------*/
 setInterval(function(){
+    let box = document.getElementById("notificationFeed");
+    if(!box) return;
 
-let box=document.getElementById("notificationFeed");
+    let messages = [
+        "AI suggested reply for ticket #1042",
+        "Ticket #1041 updated",
+        "New support request received"
+    ];
 
-if(!box) return;
+    let msg = messages[Math.floor(Math.random()*messages.length)];
+    let el = document.createElement("div");
+    el.className = "notification";
+    el.innerText = msg;
+    box.prepend(el);
+}, 12000);
 
-let messages=[
-"AI suggested reply for ticket #1042",
-"Ticket #1041 updated",
-"New support request received"
-];
-
-let msg=messages[Math.floor(Math.random()*messages.length)];
-
-let el=document.createElement("div");
-el.className="notification";
-el.innerText=msg;
-
-box.prepend(el);
-
-},12000);
-
+/* ------------------------------
+   INITIAL LOAD
+--------------------------------*/
+document.addEventListener("DOMContentLoaded", () => {
+    loadTickets();
+    loadKB();
+});
 </script>
 
 </head>
