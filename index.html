@@ -451,6 +451,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadTickets();
     loadKB();
     updateStats();  // <-- add this
+    setInterval(updateStats, 15000); // <-- update stats every 15 seconds
 });
 
 
