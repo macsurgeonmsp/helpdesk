@@ -490,31 +490,14 @@ document.addEventListener("DOMContentLoaded", () => {
 <h1>Ticket Queue</h1>
 
 <table class="ticket-table">
-
-<tr>
-<th>ID</th>
-<th>Client</th>
-<th>Issue</th>
-<th>Priority</th>
-<th>Status</th>
-</tr>
-
-<tr onclick="openTicket('#1042')">
-<td>#1042</td>
-<td>ACME Corp</td>
-<td>WiFi disconnecting</td>
-<td class="priority-high">High</td>
-<td>Open</td>
-</tr>
-
-<tr onclick="openTicket('#1041')">
-<td>#1041</td>
-<td>Bright Dental</td>
-<td>Outlook not syncing</td>
-<td class="priority-medium">Medium</td>
-<td>In Progress</td>
-</tr>
-
+  <tr>
+    <th>ID</th>
+    <th>Client</th>
+    <th>Issue</th>
+    <th>Priority</th>
+    <th>Status</th>
+  </tr>
+  <!-- JS will populate ticket rows here -->
 </table>
 
 </div>
