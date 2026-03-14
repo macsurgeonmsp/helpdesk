@@ -322,6 +322,28 @@ async function loadTickets() {
 }
 
 /* ------------------------------
+   UPDATE DASHBOARD STATS
+--------------------------------*/
+async function updateStats() {
+    try {
+        const res = await fetch(`${API_BASE}/tickets`);
+        const tickets = await res.json();
+
+        const openTickets = tickets.filter(t => t.status.toLowerCase() === 'open').length;
+        const tier1 = tickets.filter(t => t.priority.toLowerCase() === 'high').length;
+        const tier2 = tickets.filter(t => t.priority.toLowerCase() === 'medium').length;
+        const aiSuggested = tickets.filter(t => t.ai_suggested === 1).length; // make sure your DB has ai_suggested column
+
+        document.querySelector(".stat-card:nth-child(1) p").innerText = openTickets;
+        document.querySelector(".stat-card:nth-child(2) p").innerText = tier1;
+        document.querySelector(".stat-card:nth-child(3) p").innerText = tier2;
+        document.querySelector(".stat-card:nth-child(4) p").innerText = aiSuggested;
+    } catch (err) {
+        console.error("Failed to update stats:", err);
+    }
+}
+
+/* ------------------------------
    DYNAMIC KB GRID
 --------------------------------*/
 async function loadKB() {
@@ -428,7 +450,10 @@ setInterval(function(){
 document.addEventListener("DOMContentLoaded", () => {
     loadTickets();
     loadKB();
+    updateStats();  // <-- add this
 });
+
+
 </script>
 
 </head>
