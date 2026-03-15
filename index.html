@@ -215,7 +215,7 @@ body {
     font-size:28px;
     cursor:pointer;
 }
-textarea, select {
+textarea {
     width:100%;
     background:#0f0f0f;
     border:1px solid #333;
@@ -233,11 +233,8 @@ button {
 </style>
 
 <script>
-const API_BASE = "http://192.168.0.66:5000";
+const API_BASE = "http://192.168.0.66:5000"; // Flask server
 
-/* ------------------------------
-   PAGE NAVIGATION
---------------------------------*/
 function showPage(page){
     document.querySelectorAll(".page").forEach(p=>p.style.display="none");
     document.getElementById(page).style.display="block";
@@ -248,26 +245,29 @@ function showPage(page){
 --------------------------------*/
 async function loadTickets() {
     const tableBody = document.querySelector(".ticket-table tbody");
-    if(!tableBody) return;
     tableBody.innerHTML = "";
+
     try {
         const res = await fetch(`${API_BASE}/tickets`);
         const tickets = await res.json();
-        tickets.forEach(ticket=>{
+
+        tickets.forEach(ticket => {
             const tr = document.createElement("tr");
             tr.onclick = () => openTicket(ticket.id);
             tr.innerHTML = `
                 <td>#${ticket.id}</td>
+                <td>${ticket.client}</td>
                 <td>${ticket.issue}</td>
                 <td class="priority-${ticket.priority.toLowerCase()}">${ticket.priority}</td>
                 <td>${ticket.status}</td>
                 <td>${ticket.created_at}</td>
+                <td>${ticket.updated_at || "-"}</td>
             `;
             tableBody.appendChild(tr);
         });
-    } catch(err){
-        console.error("Failed to load tickets", err);
-        tableBody.innerHTML = `<tr><td colspan="5">Error loading tickets</td></tr>`;
+    } catch (err) {
+        console.error("Failed to load tickets:", err);
+        tableBody.innerHTML = `<tr><td colspan="7">Error loading tickets</td></tr>`;
     }
 }
 
@@ -278,32 +278,37 @@ async function updateStats() {
     try {
         const res = await fetch(`${API_BASE}/tickets`);
         const tickets = await res.json();
-        document.querySelector(".stat-card:nth-child(1) p").innerText = tickets.filter(t=>t.status.toLowerCase()==="open").length;
-        document.querySelector(".stat-card:nth-child(2) p").innerText = tickets.filter(t=>t.priority.toLowerCase()==="high").length;
-        document.querySelector(".stat-card:nth-child(3) p").innerText = tickets.filter(t=>t.priority.toLowerCase()==="medium").length;
+        document.querySelector(".stat-card:nth-child(1) p").innerText =
+            tickets.filter(t => t.status.toLowerCase() === "open").length;
+        document.querySelector(".stat-card:nth-child(2) p").innerText =
+            tickets.filter(t => t.priority.toLowerCase() === "high").length;
+        document.querySelector(".stat-card:nth-child(3) p").innerText =
+            tickets.filter(t => t.priority.toLowerCase() === "medium").length;
         document.querySelector(".stat-card:nth-child(4) p").innerText = tickets.length;
-    } catch(err){console.error("Failed to update stats", err);}
+    } catch (err) {
+        console.error("Failed to update stats:", err);
+    }
 }
 
 /* ------------------------------
-   LOAD KNOWLEDGE BASE
+   LOAD KB
 --------------------------------*/
-async function loadKB(){
+async function loadKB() {
     const kbGrid = document.querySelector(".kb-grid");
-    kbGrid.innerHTML="";
-    try{
+    kbGrid.innerHTML = "";
+    try {
         const res = await fetch(`${API_BASE}/kb`);
         const articles = await res.json();
-        articles.forEach(a=>{
+        articles.forEach(a => {
             const div = document.createElement("div");
             div.className = "kb-card";
-            div.onclick = ()=>openKB(a.title, a.content);
+            div.onclick = () => openKB(a.title, a.content);
             div.innerHTML = `<h3>${a.title}</h3><p>${a.content.slice(0,100)}...</p>`;
             kbGrid.appendChild(div);
         });
-    } catch(err){
-        console.error("Failed to load KB", err);
-        kbGrid.innerHTML="<p>Error loading knowledge base</p>";
+    } catch(err) {
+        console.error("Failed to load KB:", err);
+        kbGrid.innerHTML = "<p>Error loading knowledge base</p>";
     }
 }
 
@@ -312,15 +317,20 @@ async function loadKB(){
 --------------------------------*/
 async function openTicket(id){
     const modal = document.getElementById("ticketModal");
-    modal.style.display="block";
-    try{
+    modal.style.display = "block";
+
+    try {
         const res = await fetch(`${API_BASE}/tickets/${id}`);
         const ticket = await res.json();
+
         document.getElementById("ticketID").innerText = `#${ticket.id}`;
         document.getElementById("ticketClient").innerText = ticket.client;
         document.getElementById("ticketIssue").value = ticket.issue;
+        document.getElementById("ticketPriority").value = ticket.priority;
         document.getElementById("ticketStatus").value = ticket.status;
         document.getElementById("ticketResponse").value = ticket.response || "";
+        document.getElementById("ticketCreated").innerText = ticket.created_at;
+        document.getElementById("ticketUpdated").innerText = ticket.updated_at || "-";
     } catch(err){
         console.error(err);
         alert("Failed to load ticket");
@@ -330,14 +340,17 @@ async function openTicket(id){
 async function saveIssue(){
     const id = document.getElementById("ticketID").innerText.replace("#","");
     const issue = document.getElementById("ticketIssue").value;
+    const priority = document.getElementById("ticketPriority").value;
     const status = document.getElementById("ticketStatus").value;
+
     const res = await fetch(`${API_BASE}/tickets/${id}/update`, {
         method:"POST",
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({issue,status})
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({issue, priority, status})
     });
     if(res.ok) alert("Ticket updated");
-    loadTickets(); updateStats();
+    loadTickets();
+    updateStats();
 }
 
 async function sendReply(){
@@ -345,8 +358,8 @@ async function sendReply(){
     const reply = document.getElementById("ticketResponse").value;
     const res = await fetch(`${API_BASE}/tickets/${id}/reply`, {
         method:"POST",
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({reply})
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({reply})
     });
     if(res.ok) alert("Reply sent");
 }
@@ -355,10 +368,9 @@ async function sendReply(){
    KB MODAL
 --------------------------------*/
 function openKB(title, content){
-    const modal = document.getElementById("kbModal");
     document.getElementById("kbTitle").innerText = title;
     document.getElementById("kbContent").innerText = content;
-    modal.style.display="block";
+    document.getElementById("kbModal").style.display = "block";
 }
 
 function closeModal(id){
@@ -369,8 +381,8 @@ function closeModal(id){
    AI CHAT
 --------------------------------*/
 function sendChat(){
-    const input = document.getElementById("chatInput");
-    const box = document.getElementById("chatBox");
+    let input = document.getElementById("chatInput");
+    let box = document.getElementById("chatBox");
     if(input.value.trim()==="") return;
     box.innerHTML += `<p><b>You:</b> ${input.value}</p>`;
     box.innerHTML += `<p><b>AI:</b> Thinking...</p>`;
@@ -380,7 +392,7 @@ function sendChat(){
 /* ------------------------------
    INITIAL LOAD
 --------------------------------*/
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", ()=>{
     loadTickets();
     loadKB();
     updateStats();
@@ -419,21 +431,20 @@ document.addEventListener("DOMContentLoaded",()=>{
 </div>
 
 <!-- TICKETS -->
-<div id="tickets" class="page">
-<h1>Ticket Queue</h1>
 <table class="ticket-table">
 <thead>
 <tr>
 <th>ID</th>
+<th>Client</th>
 <th>Issue</th>
 <th>Priority</th>
 <th>Status</th>
 <th>Created</th>
+<th>Updated</th>
 </tr>
 </thead>
 <tbody></tbody>
 </table>
-</div>
 
 <!-- KNOWLEDGE BASE -->
 <div id="kb" class="page">
@@ -475,14 +486,22 @@ document.addEventListener("DOMContentLoaded",()=>{
 <p><b>Client:</b> <span id="ticketClient"></span></p>
 <p><b>Issue Description:</b></p>
 <textarea id="ticketIssue" rows="3"></textarea>
+<p><b>Priority:</b></p>
+<select id="ticketPriority">
+<option value="Low">Low</option>
+<option value="Medium">Medium</option>
+<option value="High">High</option>
+</select>
 <p><b>Status:</b></p>
 <select id="ticketStatus">
-<option value="open">Open</option>
-<option value="in progress">In Progress</option>
-<option value="closed">Closed</option>
+<option value="Open">Open</option>
+<option value="In Progress">In Progress</option>
+<option value="Closed">Closed</option>
 </select>
 <p><b>Technician Reply:</b></p>
 <textarea id="ticketResponse" rows="4" placeholder="Write reply to client"></textarea>
+<p><b>Created At:</b> <span id="ticketCreated"></span></p>
+<p><b>Last Updated:</b> <span id="ticketUpdated"></span></p>
 <br>
 <button onclick="saveIssue()">Save Issue</button>
 <button onclick="sendReply()">Send Reply</button>
