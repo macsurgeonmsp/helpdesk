@@ -4,15 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Mac Surgeon - Help Desk</title>
+
 <style>
-body{
+body {
     margin:0;
     font-family:Arial, Helvetica, sans-serif;
     background:#0b0b0b;
     color:white;
     display:flex;
 }
-.sidebar{
+
+/* SIDEBAR */
+.sidebar {
     width:240px;
     background:black;
     height:100vh;
@@ -21,85 +24,95 @@ body{
     display:flex;
     flex-direction:column;
 }
-.logo{
+.logo {
     padding:20px;
     text-align:center;
     border-bottom:1px solid #222;
 }
-.logo img{
+.logo img {
     width:160px;
 }
-.nav a{
+.nav a {
     color:white;
     text-decoration:none;
     padding:15px 20px;
     display:block;
     border-bottom:1px solid #111;
 }
-.nav a:hover{
+.nav a:hover {
     background:#161616;
     color:#ff2b2b;
 }
-.main{
+
+/* MAIN */
+.main {
     margin-left:240px;
     padding:30px;
     width:100%;
 }
-.header{
+.header {
     display:flex;
     justify-content:space-between;
     align-items:center;
     margin-bottom:20px;
 }
-.header h1{
+.header h1 {
     color:#ff2b2b;
 }
-.searchbar{
+
+/* SEARCH */
+.searchbar {
     background:#161616;
     border:none;
     padding:10px;
     color:white;
     width:260px;
 }
-.status-bar{
+
+/* STATUS CARDS */
+.status-bar {
     display:flex;
     gap:20px;
     margin-bottom:30px;
     flex-wrap:wrap;
 }
-.stat-card{
+.stat-card {
     background:#161616;
     padding:20px;
     border-left:4px solid #c40000;
     border-radius:4px;
     min-width:180px;
 }
-.stat-card h3{
+.stat-card h3 {
     margin:0;
     color:#ff2b2b;
 }
-.ticket-table{
+
+/* TABLE */
+.ticket-table {
     width:100%;
     border-collapse:collapse;
     background:#161616;
 }
-.ticket-table th{
+.ticket-table th {
     background:#111;
     padding:12px;
     text-align:left;
 }
-.ticket-table td{
+.ticket-table td {
     padding:12px;
     border-bottom:1px solid #222;
 }
-.ticket-table tr:hover{
+.ticket-table tr:hover {
     background:#1d1d1d;
     cursor:pointer;
 }
-.priority-high{color:#ff4b4b;font-weight:bold;}
-.priority-medium{color:#ffaa00;}
-.priority-low{color:#5bd15b;}
-.modal{
+.priority-high {color:#ff4b4b;font-weight:bold;}
+.priority-medium {color:#ffaa00;}
+.priority-low {color:#5bd15b;}
+
+/* MODALS */
+.modal {
     display:none;
     position:fixed;
     z-index:999;
@@ -109,92 +122,86 @@ body{
     height:100%;
     background:rgba(0,0,0,0.85);
 }
-.modal-content{
+.modal-content {
     background:#161616;
     margin:5% auto;
     padding:30px;
     width:70%;
     border-left:4px solid #c40000;
 }
-.close{
+.close {
     float:right;
     cursor:pointer;
     font-size:22px;
 }
-textarea, select, input{
-    width:100%;
-    background:#0f0f0f;
-    border:1px solid #333;
-    color:white;
-    padding:10px;
-    margin-bottom:10px;
-}
-button{
-    background:#c40000;
-    border:none;
-    padding:10px 18px;
-    color:white;
-    cursor:pointer;
-}
-.page{display:none;}
-.kb-grid{
+
+/* KB GRID */
+.kb-grid {
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
     gap:20px;
 }
-.kb-card{
+.kb-card {
     background:#161616;
     padding:20px;
     cursor:pointer;
 }
-.kb-card:hover{
+.kb-card:hover {
     background:#1d1d1d;
 }
-.chat-box{
+
+/* CHAT */
+.chat-box {
     background:#161616;
     height:350px;
     overflow-y:auto;
     padding:15px;
     margin-bottom:10px;
 }
-.chat-input{
+.chat-input {
     display:flex;
 }
-.chat-input input{
+.chat-input input {
     flex:1;
     padding:10px;
     background:#0f0f0f;
     border:1px solid #333;
     color:white;
 }
-.chat-input button{
+.chat-input button {
     padding:10px 20px;
     background:#c40000;
     border:none;
     color:white;
 }
-.agent-grid{
+
+/* AGENTS */
+.agent-grid {
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
     gap:20px;
 }
-.agent-card{
+.agent-card {
     background:#161616;
     padding:20px;
     border-left:4px solid #c40000;
 }
-.online{color:#5bd15b;}
-.standby{color:#ffaa00;}
-.notifications{
+.online {color:#5bd15b;}
+.standby {color:#ffaa00;}
+
+/* NOTIFICATIONS */
+.notifications {
     background:#161616;
     padding:15px;
     margin-top:20px;
     border-left:4px solid #c40000;
 }
-.notification{
+.notification {
     margin-bottom:8px;
 }
-.ai-bubble{
+
+/* FLOATING AI */
+.ai-bubble {
     position:fixed;
     bottom:20px;
     right:20px;
@@ -208,170 +215,227 @@ button{
     font-size:28px;
     cursor:pointer;
 }
+textarea {
+    width:100%;
+    background:#0f0f0f;
+    border:1px solid #333;
+    color:white;
+    padding:10px;
+}
+button {
+    background:#c40000;
+    border:none;
+    padding:10px 18px;
+    color:white;
+    cursor:pointer;
+}
+.page{display:none;}
 </style>
+
 <script>
-const API_BASE = "http://192.168.0.66:5000"; // Beelink server IP
+const API_BASE = "http://192.168.0.66:5000"; // your Flask server
 
 function showPage(page){
     document.querySelectorAll(".page").forEach(p=>p.style.display="none");
     document.getElementById(page).style.display="block";
 }
 
-/* Load Tickets */
-async function loadTickets(){
+/* ------------------------------
+   LOAD TICKETS
+--------------------------------*/
+async function loadTickets() {
     const tableBody = document.querySelector(".ticket-table tbody");
     tableBody.innerHTML = "";
-    try{
+
+    try {
         const res = await fetch(`${API_BASE}/tickets`);
         const tickets = await res.json();
-        tickets.forEach(t=>{
+
+        tickets.forEach(ticket => {
             const tr = document.createElement("tr");
-            tr.onclick = ()=>openTicket(t.id);
+            tr.onclick = () => openTicket(ticket.id);
             tr.innerHTML = `
-                <td>#${t.id}</td>
-                <td>${t.issue || "(no issue)"}</td>
-                <td>${t.status || "open"}</td>
-                <td>${t.created_at}</td>
+                <td>#${ticket.id}</td>
+                <td>${ticket.issue}</td>
+                <td class="priority-${ticket.priority.toLowerCase()}">${ticket.priority}</td>
+                <td>${ticket.status}</td>
+                <td>${ticket.created_at}</td>
             `;
             tableBody.appendChild(tr);
         });
-    }catch(e){
-        console.error(e);
-        tableBody.innerHTML = `<tr><td colspan="4">Failed to load tickets</td></tr>`;
+    } catch (err) {
+        console.error("Failed to load tickets:", err);
+        tableBody.innerHTML = `<tr><td colspan="5">Error loading tickets</td></tr>`;
     }
 }
 
-/* Open Ticket Modal */
-async function openTicket(ticketId){
-    const modal = document.getElementById("ticketModal");
-    modal.style.display = "block";
-    try{
+/* ------------------------------
+   UPDATE DASHBOARD STATS
+--------------------------------*/
+async function updateStats() {
+    try {
         const res = await fetch(`${API_BASE}/tickets`);
         const tickets = await res.json();
-        const t = tickets.find(x=>x.id===ticketId);
-        if(!t) throw new Error("Ticket not found");
-        document.getElementById("ticketID").innerText = `#${t.id}`;
-        document.getElementById("ticketClient").value = t.client || "";
-        document.getElementById("ticketIssue").value = t.issue || "";
-        document.getElementById("ticketStatus").value = t.status || "";
-        document.getElementById("ticketPriority").value = t.priority || "Medium";
-        document.getElementById("ticketResponse").value = t.response || "";
-    }catch(e){
-        console.error(e);
+        document.querySelector(".stat-card:nth-child(1) p").innerText =
+            tickets.filter(t => t.status.toLowerCase() === "open").length;
+        document.querySelector(".stat-card:nth-child(2) p").innerText =
+            tickets.filter(t => t.priority.toLowerCase() === "high").length;
+        document.querySelector(".stat-card:nth-child(3) p").innerText =
+            tickets.filter(t => t.priority.toLowerCase() === "medium").length;
+        document.querySelector(".stat-card:nth-child(4) p").innerText = tickets.length;
+    } catch (err) {
+        console.error("Failed to update stats:", err);
     }
 }
 
-/* Send Ticket Update */
-async function sendTicketUpdate(){
-    const id = parseInt(document.getElementById("ticketID").innerText.replace("#",""));
-    const payload = {
-        client: document.getElementById("ticketClient").value,
-        issue: document.getElementById("ticketIssue").value,
-        status: document.getElementById("ticketStatus").value,
-        priority: document.getElementById("ticketPriority").value,
-        response: document.getElementById("ticketResponse").value
-    };
-    try{
-        await fetch(`${API_BASE}/tickets/${id}`, {
-            method:"PATCH",
-            headers: {"Content-Type":"application/json"},
-            body: JSON.stringify(payload)
-        });
-        closeModal();
-        loadTickets();
-    }catch(e){console.error(e);}
-}
-
-/* Close Modal */
-function closeModal(){document.getElementById("ticketModal").style.display="none";}
-
-/* Load KB */
-async function loadKB(){
+/* ------------------------------
+   LOAD KB
+--------------------------------*/
+async function loadKB() {
     const kbGrid = document.querySelector(".kb-grid");
     kbGrid.innerHTML = "";
-    try{
+    try {
         const res = await fetch(`${API_BASE}/kb`);
         const articles = await res.json();
-        articles.forEach(a=>{
+        articles.forEach(a => {
             const div = document.createElement("div");
-            div.className="kb-card";
-            div.onclick=()=>openKB(a.title, a.summary || a.content);
-            div.innerHTML=`<h3>${a.title}</h3><p>${(a.summary||a.content).slice(0,100)}...</p>`;
+            div.className = "kb-card";
+            div.onclick = () => openKB(a.title, a.content);
+            div.innerHTML = `<h3>${a.title}</h3><p>${a.content.slice(0,100)}...</p>`;
             kbGrid.appendChild(div);
         });
-    }catch(e){kbGrid.innerHTML="<p>Failed to load KB</p>";}
+    } catch(err) {
+        console.error("Failed to load KB:", err);
+        kbGrid.innerHTML = "<p>Error loading knowledge base</p>";
+    }
 }
 
-/* Open KB Modal */
+/* ------------------------------
+   TICKET MODAL
+--------------------------------*/
+async function openTicket(id){
+    const modal = document.getElementById("ticketModal");
+    modal.style.display = "block";
+
+    try {
+        const res = await fetch(`${API_BASE}/tickets/${id}`);
+        const ticket = await res.json();
+
+        document.getElementById("ticketID").innerText = `#${ticket.id}`;
+        document.getElementById("ticketClient").innerText = ticket.client;
+        document.getElementById("ticketIssue").value = ticket.issue;
+        document.getElementById("ticketStatus").value = ticket.status;
+        document.getElementById("ticketResponse").value = ticket.response || "";
+    } catch(err){
+        console.error(err);
+        alert("Failed to load ticket");
+    }
+}
+
+async function saveIssue(){
+    const id = document.getElementById("ticketID").innerText.replace("#","");
+    const issue = document.getElementById("ticketIssue").value;
+    const res = await fetch(`${API_BASE}/tickets/${id}/update_issue`, {
+        method:"POST",
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({issue})
+    });
+    if(res.ok) alert("Issue updated");
+    loadTickets();
+    updateStats();
+}
+
+async function sendReply(){
+    const id = document.getElementById("ticketID").innerText.replace("#","");
+    const reply = document.getElementById("ticketResponse").value;
+    const res = await fetch(`${API_BASE}/tickets/${id}/reply`, {
+        method:"POST",
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({reply})
+    });
+    if(res.ok) alert("Reply sent");
+}
+
+/* ------------------------------
+   KB MODAL
+--------------------------------*/
 function openKB(title, content){
     document.getElementById("kbTitle").innerText = title;
     document.getElementById("kbContent").innerText = content;
-    document.getElementById("kbModal").style.display="block";
+    document.getElementById("kbModal").style.display = "block";
 }
 
-/* AI Chat */
+function closeModal(id){
+    document.getElementById(id).style.display="none";
+}
+
+/* ------------------------------
+   AI CHAT
+--------------------------------*/
 function sendChat(){
-    const input = document.getElementById("chatInput");
-    const box = document.getElementById("chatBox");
-    if(!input.value.trim()) return;
-    box.innerHTML+=`<p><b>You:</b> ${input.value}</p>`;
-    box.innerHTML+=`<p><b>AI:</b> Thinking...</p>`;
+    let input = document.getElementById("chatInput");
+    let box = document.getElementById("chatBox");
+    if(input.value.trim()==="") return;
+    box.innerHTML += `<p><b>You:</b> ${input.value}</p>`;
+    box.innerHTML += `<p><b>AI:</b> Thinking...</p>`;
     input.value="";
 }
 
+/* ------------------------------
+   INITIAL LOAD
+--------------------------------*/
 document.addEventListener("DOMContentLoaded", ()=>{
     loadTickets();
     loadKB();
+    updateStats();
     setInterval(loadTickets,15000);
+    setInterval(updateStats,15000);
 });
 </script>
 </head>
-<body>
 
+<body>
 <div class="sidebar">
-<div class="logo"><img src="macsurgeonpic1.jpg"></div>
-<div class="nav">
-<a onclick="showPage('home')">Dashboard</a>
-<a onclick="showPage('tickets')">Tickets</a>
-<a onclick="showPage('kb')">Knowledge Base</a>
-<a onclick="showPage('ai')">AI Assistant</a>
-<a onclick="showPage('agents')">AI Agents</a>
-</div>
+    <div class="logo"><img src="macsurgeonpic1.jpg"></div>
+    <div class="nav">
+        <a onclick="showPage('home')">Dashboard</a>
+        <a onclick="showPage('tickets')">Tickets</a>
+        <a onclick="showPage('kb')">Knowledge Base</a>
+        <a onclick="showPage('ai')">AI Assistant</a>
+        <a onclick="showPage('agents')">AI Agents</a>
+    </div>
 </div>
 
 <div class="main">
 
 <!-- DASHBOARD -->
 <div id="home" class="page" style="display:block">
-<div class="header">
-<h1>Help Desk Dashboard</h1>
-<input class="searchbar" placeholder="Search tickets or KB">
-</div>
-<div class="status-bar">
-<div class="stat-card"><h3>Open Tickets</h3><p>0</p></div>
-<div class="stat-card"><h3>Tier 1</h3><p>0</p></div>
-<div class="stat-card"><h3>Tier 2</h3><p>0</p></div>
-<div class="stat-card"><h3>AI Suggested</h3><p>0</p></div>
-</div>
-<div class="notifications">
-<h3>Live Notifications</h3>
-<div id="notificationFeed"></div>
-</div>
+    <div class="header">
+        <h1>Help Desk Dashboard</h1>
+        <input class="searchbar" placeholder="Search tickets or KB">
+    </div>
+    <div class="status-bar">
+        <div class="stat-card"><h3>Open Tickets</h3><p>0</p></div>
+        <div class="stat-card"><h3>High Priority</h3><p>0</p></div>
+        <div class="stat-card"><h3>Medium Priority</h3><p>0</p></div>
+        <div class="stat-card"><h3>Total Tickets</h3><p>0</p></div>
+    </div>
 </div>
 
 <!-- TICKETS -->
 <div id="tickets" class="page">
 <h1>Ticket Queue</h1>
 <table class="ticket-table">
-  <thead>
-    <tr>
-     <th>ID</th>
-     <th>Issue</th>
-     <th>Status</th>
-     <th>Created</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
+<thead>
+<tr>
+<th>ID</th>
+<th>Issue</th>
+<th>Priority</th>
+<th>Status</th>
+<th>Created</th>
+</tr>
+</thead>
+<tbody></tbody>
 </table>
 </div>
 
@@ -410,30 +474,29 @@ document.addEventListener("DOMContentLoaded", ()=>{
 <!-- TICKET MODAL -->
 <div class="modal" id="ticketModal">
 <div class="modal-content">
-<span class="close" onclick="closeModal()">X</span>
+<span class="close" onclick="closeModal('ticketModal')">X</span>
 <h2>Ticket Details <span id="ticketID"></span></h2>
-<input id="ticketClient" placeholder="Client Name">
-<input id="ticketIssue" placeholder="Issue">
+<p><b>Client:</b> <span id="ticketClient"></span></p>
+<p><b>Issue Description:</b></p>
+<textarea id="ticketIssue" rows="3"></textarea>
+<p><b>Status:</b></p>
 <select id="ticketStatus">
-  <option>open</option>
-  <option>pending</option>
-  <option>closed</option>
+<option value="open">Open</option>
+<option value="in progress">In Progress</option>
+<option value="closed">Closed</option>
 </select>
-<select id="ticketPriority">
-  <option>High</option>
-  <option>Medium</option>
-  <option>Low</option>
-</select>
-<h3>Technician Reply</h3>
-<textarea id="ticketResponse" rows="6" placeholder="Write response to client..."></textarea>
-<button onclick="sendTicketUpdate()">Send Reply</button>
+<p><b>Technician Reply:</b></p>
+<textarea id="ticketResponse" rows="4" placeholder="Write reply to client"></textarea>
+<br>
+<button onclick="saveIssue()">Save Issue</button>
+<button onclick="sendReply()">Send Reply</button>
 </div>
 </div>
 
 <!-- KB MODAL -->
 <div class="modal" id="kbModal">
 <div class="modal-content">
-<span class="close" onclick="this.parentElement.parentElement.style.display='none'">X</span>
+<span class="close" onclick="closeModal('kbModal')">X</span>
 <h2 id="kbTitle"></h2>
 <p id="kbContent"></p>
 </div>
